@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="">
       <Head>
-        <title>Tino's Instagram</title>
+        <title>Tino&apos;s Instagram</title>
       </Head>
       <Header />
 
