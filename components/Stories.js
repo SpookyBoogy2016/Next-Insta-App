@@ -1,4 +1,4 @@
-import faker, { image } from "faker";
+import faker from "faker";
 import Story from "./Story";
 import React, { useEffect, useState } from "react";
 
@@ -6,7 +6,7 @@ function Stories() {
   const [suggestions, setSuggestion] = useState([]);
 
   useEffect(() => {
-    const suggestions = [...Array(10)].map((_, i) => ({
+    const suggestions = [...Array(20)].map((_, i) => ({
       ...faker.helpers.contextualCard(),
       id: i,
     }));
@@ -15,14 +15,15 @@ function Stories() {
   }, []);
 
   return (
-    <div className="flex">
-      {suggestions.map((profile) => (
-        <Story
-          key={profile.id}
-          img={profile.avatar}
-          username={profile.username}
-        />
-      ))}
+    <div>
+      <div
+        className="flex space-x-2 p-6 bg-white mt-8 border-gray-200 
+      border rounded-sm overflow-x-scroll scrollbar-thin scrollbar-thumb-black"
+      >
+        {suggestions.map((profile) => (
+          <Story key={profile.id} username={profile.username} />
+        ))}
+      </div>
     </div>
   );
 }

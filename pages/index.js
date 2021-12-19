@@ -6,7 +6,7 @@ import styles from "../styles/Home.module.css";
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="bg-gray-50 h-screen overflow-y-scroll scrollbar-hide">
       <Head>
         <title>Tino&apos;s Instagram</title>
       </Head>
