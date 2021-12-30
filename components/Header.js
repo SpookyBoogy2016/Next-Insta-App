@@ -9,11 +9,14 @@ import {
 import { HomeIcon } from "@heroicons/react/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { useRecoilState } from "recoil";
+import { modalState } from "../atoms/modalAtom";
 import InstaLogo from "../public/Instagram_logo.svg";
 import SmallInstaLogo from "../public/Instagram_simple_icon.svg";
 
 function Header() {
   const { data: session } = useSession();
+  const [openn, setOpen] = useRecoilState(modalState);
   const router = useRouter();
 
   return (
@@ -62,7 +65,10 @@ function Header() {
                   3
                 </div>
               </div>
-              <PlusCircleIcon className="navButton" />
+              <PlusCircleIcon
+                onClick={() => setOpen(true)}
+                className="navButton"
+              />
               <UserGroupIcon className="navButton" />
               <HeartIcon className="navButton" />
               <img
