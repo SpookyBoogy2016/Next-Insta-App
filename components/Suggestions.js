@@ -22,8 +22,11 @@ function Suggestions() {
         <button className="text-gray-600 font-semibold">See all</button>
       </div>
       {suggestions.map((profile) => (
-        <div className="flex items-center justify-between mt-3">
-          <MiniProfilePic key={profile.id} username={profile.username} />
+        <div
+          key={profile.id}
+          className="flex items-center justify-between mt-3"
+        >
+          <MiniProfilePic username={profile.username} />
           <div className="flex-1 ml-4">
             <h2 className="font-semibold text-sm">{profile.username}</h2>
             <h3 className="text-xs text-gray-400">
