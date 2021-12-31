@@ -7,8 +7,47 @@ import {
   PaperAirplaneIcon,
 } from "@heroicons/react/outline";
 import { HeartIcon as HeartIconFilled } from "@heroicons/react/solid";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { db } from "../firebase";
+import Moment from "react-moment";
 
 function Post({ key, id, username, userImg, img, caption }) {
+  const { data: session } = useSession();
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "posts", id, "comments"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot) => setComments(snapshot.docs)
+      ),
+    [db]
+  );
+
+  const sendComment = async (e) => {
+    e.preventDefault();
+    const commentToSend = comment;
+    setComment("");
+    await addDoc(collection(db, "posts", id, "comments"), {
+      comment: commentToSend,
+      username: session.user.username,
+      userImage: session.user.image,
+      timestamp: serverTimestamp(),
+    });
+  };
+
   return (
     <div className="bg-white my-7 border rounded-sm">
       {/* Header */}
@@ -23,32 +62,65 @@ function Post({ key, id, username, userImg, img, caption }) {
       {/* Image */}
       <img src={img} className="object-cover w-full" />
       {/* Buttons */}
-      <div className="flex justify-between px-4 pt-4">
-        <div className="flex space-x-4">
-          <HeartIcon className="postButton" />
-          <HeartIconFilled className="postButton" />
-          <ChatIcon className="postButton" />
-          <PaperAirplaneIcon className="postButton" />
+      {session && (
+        <div className="flex justify-between px-4 pt-4">
+          <div className="flex space-x-4">
+            <HeartIcon className="postButton" />
+            <HeartIconFilled className="postButton" />
+            <ChatIcon className="postButton" />
+            <PaperAirplaneIcon className="postButton" />
+          </div>
+          <BookmarkIcon className="postButton" />
         </div>
-        <BookmarkIcon className="postButton" />
-      </div>
+      )}
+
       {/* Caption */}
       <p className="p-5 truncate">
         <span className="font-bold mr-1">{username} </span>
         {caption}
       </p>
       {/* Comments */}
+      {comments.length > 0 && (
+        <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-black scrollbar-thin">
+          {comments.map((comment) => (
+            <div key={comment.id} className="flex items-center space-x-2 mb-3">
+              <img
+                src={comment.data().userImage}
+                className="h-7 w-7 rounded-full"
+              />
+              <p className="text-sm flex-1">
+                <span className="font-bold">{comment.data().username}</span>{" "}
+                {comment.data().comment}
+              </p>
+              <Moment fromNow className="pr-5 text-xs">
+                {comment.data().timestamp?.toDate()}
+              </Moment>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Input Box */}
-      <form action="" className="flex items-center p-4">
-        <EmojiHappyIcon className="h-7" />
-        <input
-          type="text"
-          placeholder="Add a comment..."
-          className="border-none flex-1 focus:ring-0 outline-none"
-        />
-        <button className="font-semibold text-blue-500">Post</button>
-      </form>
+      {session && (
+        <form action="" className="flex items-center p-4">
+          <EmojiHappyIcon className="h-7" />
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="border-none flex-1 focus:ring-0 outline-none"
+          />
+          <button
+            type="submit"
+            disabled={!comment.trim()}
+            onClick={sendComment}
+            className="font-semibold text-blue-500"
+          >
+            Post
+          </button>
+        </form>
+      )}
     </div>
   );
 }
